@@ -1,3 +1,6 @@
+# kubectl autocomplete
+kubectl completion bash >> ~/.bashrc
+
 [[ -s ~/.bashrc ]] && source ~/.bashrc
 
 export CLICOLOR=1

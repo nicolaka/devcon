@@ -1,10 +1,12 @@
 FROM ubuntu:18.04
 MAINTAINER Nicola Kabar <nicolaka@gmail.com>
 
+RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main " >> /etc/apt/sources.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+
 # Installing required packages
 RUN apt-get update -y \
     && apt-get install --no-install-recommends -y \
-    gnupg \
     build-essential \
     vim \
     git \
@@ -31,20 +33,19 @@ RUN apt-get update -y \
     dnsutils \
     && rm -rf /var/lib/apt/lists/*
 
-
 # Azure CLI + Powershell 
-RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ bionic main" >> /etc/apt/sources.list
-RUN echo "deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main" >> /etc/apt/sources.list
+RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ xenial main" >> /etc/apt/sources.list
+RUN echo "deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod xenial main" >> /etc/apt/sources.list
 RUN curl -L https://packages.microsoft.com/keys/microsoft.asc |  apt-key add -
 RUN apt-get update && apt-get install -y azure-cli powershell 
 
-
-# Installaing Docker Client and Docker Compose
-RUN curl -Ssl https://test.docker.com | sh
+# Installating Docker Client and Docker Compose
+RUN curl -Ssl https://get.docker.com | sh
+RUN pip install --upgrade pip
 RUN pip install docker-compose
-
-# Installing Additional PIP based libraries
-RUN pip install awscli \
+RUN pip install --ignore-installed \
+    docker-compose \
+    awscli \
     six \
     docker \ 
     httpie \
@@ -53,10 +54,11 @@ RUN pip install awscli \
     xmltodict \
     pyOpenSSL==16.2.0 
 
+
 # Installing + Setting Up GO Environment
 ENV GOLANG_VERSION 1.12.6
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 dbcf71a3c1ea53b8d54ef1b48c85a39a6c9a935d01fc8291ff2b92028e59913c
+ENV GOLANG_DOWNLOAD_SHA256 4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff
 
 RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 	&& echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
@@ -82,22 +84,33 @@ RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk-bionic main" | tee
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN apt-get update && apt-get install -y google-cloud-sdk 
 
+# Salt
+RUN curl https://repo.saltstack.com/apt/ubuntu/16.04/amd64/2016.11/SALTSTACK-GPG-KEY.pub  | apt-key add - \
+    echo "deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main" | tee -a /etc/apt/sources.list.d/saltstack.list \
+    apt-get update && apt-get install -y salt-ssh salt-minion salt-master
+
 # Kubernetes Tools 
-ENV KUBECTL_VER 1.14.1
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx -O /usr/local/bin/kubectx && chmod +x /usr/local/bin/kubectx
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens -O /usr/local/bin/kubens && chmod +x /usr/local/bin/kubens
-RUN wget https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VER/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
+RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.14.1/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
-# Installing Helm
+# Helm v2.11.1 
 ENV HELM_VERSION 2.14.1
 RUN wget https://storage.googleapis.com/kubernetes-helm/helm-v$HELM_VERSION-linux-amd64.tar.gz -O /tmp/helm-v$HELM_VERSION-linux-amd64.tar.gz && \
     tar -zxvf /tmp/helm-v$HELM_VERSION-linux-amd64.tar.gz && \
     mv linux-amd64/helm /usr/local/bin/helm && \
     chmod +x /usr/local/bin/helm
 
-# Calico
-ENV GOLANG_VERSION 3.7.3
-RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$GOLANG_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
+# Calico Version 1.6.1
+RUN wget https://github.com/projectcalico/calicoctl/releases/download/v1.6.1/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
+
+# Setting WORKDIR and USER
+USER root
+WORKDIR /root
+VOLUME ["/home/devcon"]
+
+#DIVER
+RUN go get -u github.com/thebsdbox/diver
 
 # Node
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
@@ -105,16 +118,11 @@ RUN apt-get install -y nodejs
 RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
     && apt-get update && sudo apt-get install yarn 	
-
+ 
 # DCI
 RUN curl --output /tmp/dci https://download.docker.com/dci/latest/dci-linux-amd64 && sudo install /tmp/dci /usr/local/bin/dci
 
-# Setting WORKDIR and USER
-USER root
-WORKDIR /root
-VOLUME ["/home/devcon"]
-
-# Sample Bash Profile that will be overwritten if your mounted dir has a .profile
+# Sample Bash Profile that will be overwritted if your mounted dir has a .profile
 ADD bash_profile  .profile
 # Running Bash
 CMD ["/bin/bash", "-l"]
