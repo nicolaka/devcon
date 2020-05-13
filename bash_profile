@@ -1,7 +1,8 @@
-# kubectl autocomplete
-kubectl completion bash >> ~/.bashrc
-
 [[ -s ~/.bashrc ]] && source ~/.bashrc
+
+# kubectl + eksctl autocomplete
+kubectl completion bash >> ~/.bashrc
+eksctl completion bash >> ~/.bashrc
 
 export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced

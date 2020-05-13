@@ -116,6 +116,11 @@ RUN set -x; cd "$(mktemp -d)" && \
   "$KREW" update && \
   export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+# Installing eksctl
+
+RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
+    mv /tmp/eksctl /usr/local/bin
+
 # Setting WORKDIR and USER
 USER root
 WORKDIR /root
