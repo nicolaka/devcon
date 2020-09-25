@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install -y azure-cli powershell
 
 # Installaing Docker Client and Docker Compose
 RUN curl -Ssl https://get.docker.com | sh
-RUN pip install docker-compose
+#RUN pip install docker-compose
 
 # Installing Additional PIP based libraries
 RUN pip install awscli \
@@ -54,9 +54,9 @@ RUN pip install awscli \
     pyOpenSSL==16.2.0 
 
 # Installing + Setting Up GO Environment
-ENV GOLANG_VERSION 1.12.6
+ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 dbcf71a3c1ea53b8d54ef1b48c85a39a6c9a935d01fc8291ff2b92028e59913c
+ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
 
 RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 	&& echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
@@ -70,7 +70,7 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 
 # Installing Terraform 
-ENV TERRAFORM_VERSION 0.12.24
+ENV TERRAFORM_VERSION 0.13.3
 RUN curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o terraform.zip
 RUN unzip terraform.zip  -d /usr/local/bin  
 RUN rm terraform.zip
@@ -84,7 +84,7 @@ RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN apt-get update && apt-get install -y google-cloud-sdk 
 
 # Kubernetes Tools 
-ENV KUBECTL_VER 1.18.2
+ENV KUBECTL_VER 1.19.2
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx -O /usr/local/bin/kubectx && chmod +x /usr/local/bin/kubectx
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens -O /usr/local/bin/kubens && chmod +x /usr/local/bin/kubens
 RUN wget https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VER/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
@@ -97,8 +97,8 @@ RUN wget https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz -O /tmp/helm
     chmod +x /usr/local/bin/helm
 
 # Calico
-ENV GOLANG_VERSION 3.13.3
-RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$GOLANG_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
+ENV CALICO_VERSION 3.16.1
+RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
 
 # Node
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
@@ -108,13 +108,11 @@ RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
     && apt-get update && sudo apt-get install yarn 	
 
 # Installing Krew
-RUN set -x; cd "$(mktemp -d)" && \
-  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.{tar.gz,yaml}" && \
+RUN curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.{tar.gz,yaml}" && \
   tar zxvf krew.tar.gz && \
   KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" && \
   "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz && \
-  "$KREW" update && \
-  export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+  "$KREW" update 
 
 # Installing eksctl
 

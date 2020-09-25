@@ -7,7 +7,7 @@ eksctl completion bash >> ~/.bashrc
 export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced
 export LS_OPTIONS='--color=auto'
-
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # aliases
 alias ls='ls $LS_OPTIONS'
@@ -33,7 +33,7 @@ function prompt {
  local WHITEBOLD="\[\033[1;37m\]"
  local RESETCOLOR="\[\e[00m\]"
 
- export PS1="\n$RED\u $PURPLE@ $GREEN\w $RESETCOLOR$GREENBOLD\$(git branch 2> /dev/null)\n $BLUE[\#] 🐳  → $RESETCOLOR"
+ export PS1="\n$RED\u $PURPLE@ $GREEN\w $RESETCOLOR$GREENBOLD\$(git branch 2> /dev/null)\n $GREEN[\#] 🐳  → $RESETCOLOR"
  export PS2=" | → $RESETCOLOR "
 }
 
