@@ -7,6 +7,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+#export TERM="xterm-256color"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to load
@@ -125,11 +126,11 @@ POWERLEVEL9K_PROMPT_ON_NEWLINE=false
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%f"
 
 # Visual customisation of the second prompt line
-local user_symbol="$"
-if [[ $(print -P "%#") =~ "#" ]]; then
-    user_symbol = "#"
-fi
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%{%B%F{black}%K{yellow}%} $user_symbol%{%b%f%k%F{yellow}%} %{%f%}"
+#local user_symbol="$"
+#if [[ $(print -P "%#") =~ "#" ]]; then
+#    user_symbol = "#"
+#fi
+#POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%{%B%F{black}%K{yellow}%} $user_symbol%{%b%f%k%F{yellow}%} %{%f%}"
 
 
 # Change the git status to red when something isn't committed and pushed

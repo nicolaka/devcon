@@ -11,10 +11,9 @@ How to use:
 $ docker run -it --rm --hostname devcon -v /var/run/docker.sock:/var/run/docker.sock nicolaka/devcon:latest
 ```
 
-Currently the below dev tools are installed:
+![img](devcon.png)
 
-
-Optionally, you can mount your local dev directory inside the container by adding `-v /path/to/dir:/root`
+Optionally, you can mount your local Mac dev directory inside the container by adding `-v /path/to/dir:/root`.
 
 Enjoy!
  

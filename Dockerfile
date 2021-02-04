@@ -33,7 +33,8 @@ RUN apt-get update -y \
     zsh \
     fonts-powerline \
     nodejs \
-    npm \
+    npm \ 
+    iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Installaing Docker CLI
@@ -124,6 +125,9 @@ VOLUME ["/home/devcon"]
 ENV TERM xterm
 ENV ZSH_THEME agnoster
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+COPY zshrc .zshrc
 
 # Running ZSH
 CMD ["zsh"]
