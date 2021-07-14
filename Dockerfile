@@ -35,16 +35,18 @@ RUN apt-get update -y \
     nodejs \
     npm \ 
     iproute2 \
+    file \
+    graphviz \
     && rm -rf /var/lib/apt/lists/*
 
 # Package Versions
 ENV DOCKER_VERSION 5:20.10.3~3-0~ubuntu-groovy
 ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
-ENV TERRAFORM_VERSION 0.14.5
+ENV TERRAFORM_VERSION 0.14.9
 ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.6.2
-ENV PACKER_VERSION 1.6.6
+ENV VAULT_VERSION 1.7.0
+ENV PACKER_VERSION 1.7.1
 ENV KUBECTL_VER 1.19.2
 ENV HELM_VERSION 3.2.0
 ENV CALICO_VERSION 3.16.1
@@ -116,11 +118,13 @@ RUN wget https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz -O /tmp/helm
     chmod +x /usr/local/bin/helm
 
 # Installing Krew
-RUN curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.{tar.gz,yaml}" && \
-  tar zxvf krew.tar.gz && \
-  KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_amd64" && \
-  "$KREW" install --manifest=krew.yaml --archive=krew.tar.gz && \
-  "$KREW" update 
+RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
+    ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" && \
+    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
+    tar zxvf krew.tar.gz && \
+    KREW=./krew-"${OS}_${ARCH}" && \
+    "$KREW" install krew && \
+    cp $HOME/.krew/bin/kubectl-krew /usr/local/bin/
 
 # Installing eksctl
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
@@ -128,6 +132,9 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
 
 # Installing calicoctl
 RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
+
+# Installing Azure CLI
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Setting WORKDIR and USER 
 USER root
