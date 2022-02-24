@@ -1,9 +1,9 @@
-FROM ubuntu:20.10
+FROM ubuntu:focal
 MAINTAINER Nicola Kabar <nicolaka@gmail.com>
 
 # Installing required packages
-RUN apt-get update -y \
-    && apt-get install --no-install-recommends -y \
+RUN apt-get update -y 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     gnupg \
     build-essential \
     vim \
@@ -44,13 +44,15 @@ RUN apt-get update -y \
 ENV DOCKER_VERSION 5:20.10.3~3-0~ubuntu-groovy
 ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
-ENV TERRAFORM_VERSION 0.14.9
+ENV TERRAFORM_VERSION 1.1.3
 ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.7.0
+ENV VAULT_VERSION 1.9.2
 ENV PACKER_VERSION 1.7.1
+ENV BOUNDARY_VERSION 0.7.1
 ENV KUBECTL_VER 1.19.2
 ENV HELM_VERSION 3.2.0
 ENV CALICO_VERSION 3.16.1
+
 
 # Installaing Docker CLI
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -58,7 +60,8 @@ RUN sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
-RUN apt-get update && apt-get install docker-ce-cli=${DOCKER_VERSION}
+#RUN apt-get update && apt-get install docker-ce-cli=${DOCKER_VERSION}
+RUN apt-get update && apt-get -y install docker-ce-cli 
 
 # Installing Additional PIP based libraries
 RUN pip install awscli \
@@ -101,6 +104,11 @@ RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER
 RUN unzip packer.zip -d /usr/local/bin
 RUN rm packer.zip
 
+# Installing Boundary
+RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_amd64.zip -o boundary.zip
+RUN unzip boundary.zip -d /usr/local/boundary
+RUN rm boundary.zip
+
 # Installing ccat (https://github.com/jingweno/ccat)
 RUN go get -u github.com/jingweno/ccat
 
@@ -124,8 +132,9 @@ RUN wget https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz -O /tmp/helm
 # Installing Krew
 RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
     ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" && \
-    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
-    tar zxvf krew.tar.gz && \
+    KREW="krew-${OS}_${ARCH}" && \
+    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" && \
+    tar zxvf ${KREW}.tar.gz && \
     KREW=./krew-"${OS}_${ARCH}" && \
     "$KREW" install krew && \
     cp $HOME/.krew/bin/kubectl-krew /usr/local/bin/
