@@ -109,6 +109,11 @@ RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${
 RUN unzip boundary.zip -d /usr/local/boundary
 RUN rm boundary.zip
 
+# Installing Waypoint
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+RUN sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+RUN sudo apt-get update && sudo apt-get install waypoint
+
 # Installing ccat (https://github.com/jingweno/ccat)
 RUN go get -u github.com/jingweno/ccat
 
@@ -148,6 +153,10 @@ RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_V
 
 # Installing Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# Installing Snyk CLI
+RUN curl https://static.snyk.io/cli/latest/snyk-linux -o /usr/local/bin/snyk && chmod +x /usr/local/bin/snyk
+
 
 # Setting WORKDIR and USER 
 USER root
