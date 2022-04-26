@@ -46,7 +46,7 @@ ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
 ENV TERRAFORM_VERSION 1.1.7
 ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.10.0
+ENV VAULT_VERSION 1.10.0+ent
 ENV PACKER_VERSION 1.8.0
 ENV BOUNDARY_VERSION 0.7.1
 ENV KUBECTL_VER 1.23.5
@@ -109,6 +109,7 @@ RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${
 RUN unzip boundary.zip -d /usr/local/boundary
 RUN rm boundary.zip
 
+
 # Installing ccat (https://github.com/jingweno/ccat)
 RUN go get -u github.com/jingweno/ccat
 
@@ -147,7 +148,7 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
 RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
 
 # Installing Azure CLI
-RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+#RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Setting WORKDIR and USER 
 USER root
