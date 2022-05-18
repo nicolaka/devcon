@@ -48,7 +48,7 @@ ENV TERRAFORM_VERSION 1.1.7
 ENV TECLI_VERSION 0.2.0
 ENV VAULT_VERSION 1.10.0
 ENV PACKER_VERSION 1.8.0
-ENV BOUNDARY_VERSION 0.7.1
+ENV BOUNDARY_VERSION 0.8.1
 ENV KUBECTL_VER 1.23.5
 ENV HELM_VERSION 3.8.1
 ENV CALICO_VERSION 3.16.1
@@ -106,7 +106,7 @@ RUN rm packer.zip
 
 # Installing Boundary
 RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_amd64.zip -o boundary.zip
-RUN unzip boundary.zip -d /usr/local/boundary
+RUN unzip boundary.zip -d /usr/local/bin
 RUN rm boundary.zip
 
 # Installing Waypoint
