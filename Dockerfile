@@ -46,22 +46,18 @@ ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
 ENV TERRAFORM_VERSION 1.1.7
 ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.10.0+ent
+ENV VAULT_VERSION 1.10.1
 ENV PACKER_VERSION 1.8.0
-ENV BOUNDARY_VERSION 0.7.1
+ENV BOUNDARY_VERSION 0.8.0
 ENV KUBECTL_VER 1.23.5
 ENV HELM_VERSION 3.8.1
 ENV CALICO_VERSION 3.16.1
 
 
-# Installaing Docker CLI
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-RUN sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-#RUN apt-get update && apt-get install docker-ce-cli=${DOCKER_VERSION}
-RUN apt-get update && apt-get -y install docker-ce-cli 
+# Installaing Docker CLI & Docker Compose
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
+    apt-get update && apt-get -y install docker-ce-cli docker-compose-plugin
 
 # Installing Additional PIP based libraries
 RUN pip install awscli \
@@ -149,6 +145,10 @@ RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_V
 
 # Installing Azure CLI
 #RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# Installing Sigstore Cosign (https://github.com/sigstore/cosign)
+
+RUN wget https://github.com/sigstore/cosign/releases/download/v1.8.0/cosign-linux-amd64 -O /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 
 # Setting WORKDIR and USER 
 USER root
