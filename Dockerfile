@@ -44,11 +44,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 ENV DOCKER_VERSION 5:20.10.3~3-0~ubuntu-groovy
 ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
-ENV TERRAFORM_VERSION 1.1.7
+ENV TERRAFORM_VERSION 1.2.3
 ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.10.1
-ENV PACKER_VERSION 1.8.0
-ENV BOUNDARY_VERSION 0.8.0
+ENV VAULT_VERSION 1.11.0
+ENV PACKER_VERSION 1.8.2
+ENV BOUNDARY_VERSION 0.9.0
 ENV KUBECTL_VER 1.23.5
 ENV HELM_VERSION 3.8.1
 ENV CALICO_VERSION 3.16.1
@@ -60,7 +60,8 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     apt-get update && apt-get -y install docker-ce-cli docker-compose-plugin
 
 # Installing Additional PIP based libraries
-RUN pip install awscli \
+RUN pip install \
+#    awscli \
     six \
     docker \
     httpie \
@@ -140,6 +141,9 @@ RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
     "$KREW" install krew && \
     cp $HOME/.krew/bin/kubectl-krew /usr/local/bin/
 
+# Installing Kubectl 
+RUN kubectl krew install tree
+
 # Installing eksctl
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
     mv /tmp/eksctl /usr/local/bin
@@ -157,6 +161,18 @@ RUN wget https://github.com/sigstore/cosign/releases/download/v1.8.0/cosign-linu
 # Installing Snyk CLI
 RUN curl https://static.snyk.io/cli/latest/snyk-linux -o /usr/local/bin/snyk && chmod +x /usr/local/bin/snyk
 
+# Installing AWS CLI v2 + Session Manager + IAM Authenticator
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    sudo ./aws/install
+RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
+    dpkg -i session-manager-plugin.deb 
+RUN curl https://s3.us-west-2.amazonaws.com/amazon-eks/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator -o /usr/local/bin/aws-iam-authenticator && chmod +x /usr/local/bin/aws-iam-authenticator
+
+# Installing Infracost CLI
+RUN wget https://github.com/infracost/infracost/releases/download/v0.10.8/infracost-linux-amd64.tar.gz
+RUN tar xzf infracost-linux-amd64.tar.gz -C /tmp
+RUN mv /tmp/infracost-linux-amd64 /usr/local/bin/infracost
 
 # Setting WORKDIR and USER 
 USER root
