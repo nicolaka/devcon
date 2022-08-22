@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 MAINTAINER Nicola Kabar <nicolaka@gmail.com>
 
 # Installing required packages
@@ -15,8 +15,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     iputils-ping \
     ssh \
     ansible \
-    netcat \
-    python-dev \
+#    netcat \
+#    python-dev \
     python-setuptools \
     python3-pip \
     zip \
@@ -38,17 +38,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     iproute2 \
     file \
     graphviz \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
 # Package Versions
-ENV DOCKER_VERSION 5:20.10.3~3-0~ubuntu-groovy
-ENV GOLANG_VERSION 1.15.2
-ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
+ENV DOCKER_VERSION 5:20.10.3~3-0~ubuntu-jammy
+ENV GOLANG_VERSION 1.19
+ENV GOLANG_DOWNLOAD_SHA256 464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6 
 ENV TERRAFORM_VERSION 1.2.3
 ENV TECLI_VERSION 0.2.0
 ENV VAULT_VERSION 1.11.0
 ENV PACKER_VERSION 1.8.2
-ENV BOUNDARY_VERSION 0.9.0
+ENV BOUNDARY_VERSION 0.10.0
 ENV KUBECTL_VER 1.23.5
 ENV HELM_VERSION 3.8.1
 ENV CALICO_VERSION 3.16.1
@@ -112,10 +113,9 @@ RUN sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com
 RUN sudo apt-get update && sudo apt-get install waypoint
 
 # Installing ccat (https://github.com/jingweno/ccat)
-RUN go get -u github.com/jingweno/ccat
-
+RUN go install github.com/jingweno/ccat@latest
 # Installing CFSSL (https://github.com/cloudflare/cfssl)
-RUN go get -u github.com/cloudflare/cfssl/cmd/cfssl
+RUN go install github.com/cloudflare/cfssl/cmd/cfssl@latest
 
 # Installing gcloud
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && apt-get update -y && apt-get install google-cloud-sdk -y
