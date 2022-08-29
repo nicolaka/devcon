@@ -15,8 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     iputils-ping \
     ssh \
     ansible \
-#    netcat \
-#    python-dev \
+    netcat \
     python-setuptools \
     python3-pip \
     zip \
@@ -39,6 +38,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     file \
     graphviz \
     less \
+    postgresql \
+    postgresql-contrib \
     && rm -rf /var/lib/apt/lists/*
 
 # Package Versions
@@ -48,6 +49,7 @@ ENV GOLANG_DOWNLOAD_SHA256 464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56
 ENV TERRAFORM_VERSION 1.2.3
 ENV TECLI_VERSION 0.2.0
 ENV VAULT_VERSION 1.11.0
+ENV CONSUL_VERSION 1.13.1
 ENV PACKER_VERSION 1.8.2
 ENV BOUNDARY_VERSION 0.10.0
 ENV KUBECTL_VER 1.23.5
@@ -62,7 +64,6 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
 
 # Installing Additional PIP based libraries
 RUN pip install \
-#    awscli \
     six \
     docker \
     httpie \
@@ -106,6 +107,11 @@ RUN rm packer.zip
 RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_amd64.zip -o boundary.zip
 RUN unzip boundary.zip -d /usr/local/bin
 RUN rm boundary.zip
+
+# Installing Consul 
+RUN curl https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip -o consul.zip
+RUN unzip consul.zip -d /usr/local/bin
+RUN rm consul.zip
 
 # Installing Waypoint
 RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
