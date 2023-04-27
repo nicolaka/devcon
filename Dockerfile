@@ -1,5 +1,4 @@
 FROM ubuntu:jammy
-MAINTAINER Nicola Kabar <nicolaka@gmail.com>
 
 # Installing required packages
 RUN apt-get update -y 
@@ -40,26 +39,27 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     less \
     postgresql \
     postgresql-contrib \
+    redis \
     && rm -rf /var/lib/apt/lists/*
 
 # Package Versions
-ENV DOCKER_VERSION 5:20.10.3~3-0~ubuntu-jammy
-ENV GOLANG_VERSION 1.19
-ENV GOLANG_DOWNLOAD_SHA256 464b6b66591f6cf055bc5df90a9750bf5fbc9d038722bb84a9d56a2bea974be6 
-ENV TERRAFORM_VERSION 1.2.3
-ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.11.0
-ENV CONSUL_VERSION 1.13.1
-ENV PACKER_VERSION 1.8.2
-ENV BOUNDARY_VERSION 0.10.0
-ENV KUBECTL_VER 1.23.5
+ENV GOLANG_VERSION 1.20.3
+ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
+ENV TERRAFORM_VERSION 1.4.5
+#ENV TECLI_VERSION 0.2.0
+ENV VAULT_VERSION 1.13.0
+ENV CONSUL_VERSION 1.15.0
+ENV PACKER_VERSION 1.8.5
+ENV BOUNDARY_VERSION 0.12.1
+ENV WAYPOINT_VERSION 0.11.0
+ENV KUBECTL_VER 1.25.2
 ENV HELM_VERSION 3.8.1
 ENV CALICO_VERSION 3.16.1
 
-
 # Installaing Docker CLI & Docker Compose
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
+RUN install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     apt-get update && apt-get -y install docker-ce-cli docker-compose-plugin
 
 # Installing Additional PIP based libraries
@@ -73,7 +73,7 @@ RUN pip install \
     pyOpenSSL==16.2.0 
 
 # Installing + Setting Up GO Environment
-ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-arm64.tar.gz
 RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 	&& echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
 	&& sudo tar -C /usr/local -xzf golang.tar.gz \
@@ -86,37 +86,37 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Installing HashiCorp Stack
 # Installing Terraform 
-RUN curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o terraform.zip
+RUN curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm64.zip -o terraform.zip
 RUN unzip terraform.zip  -d /usr/local/bin  
 RUN rm terraform.zip
 
 # Installing tecli ( Terraform Cloud/Enterprise CLI)
-RUN wget https://github.com/awslabs/tecli/releases/download/${TECLI_VERSION}/tecli-linux-amd64 -O /usr/local/bin/tecli && chmod +x /usr/local/bin/tecli
+#RUN wget https://github.com/awslabs/tecli/releases/download/${TECLI_VERSION}/tecli-linux-arm64 -O /usr/local/bin/tecli && chmod +x /usr/local/bin/tecli
 
 # Installing Vault
-RUN curl https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip -o vault.zip
+RUN curl https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_arm64.zip -o vault.zip
 RUN unzip vault.zip  -d /usr/local/bin  
 RUN rm vault.zip
 
 # Installing Packer
-RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip -o packer.zip
+RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_arm64.zip -o packer.zip
 RUN unzip packer.zip -d /usr/local/bin
 RUN rm packer.zip
 
 # Installing Boundary
-RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_amd64.zip -o boundary.zip
+RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_arm64.zip -o boundary.zip
 RUN unzip boundary.zip -d /usr/local/bin
 RUN rm boundary.zip
 
 # Installing Consul 
-RUN curl https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip -o consul.zip
+RUN curl https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_arm64.zip -o consul.zip
 RUN unzip consul.zip -d /usr/local/bin
 RUN rm consul.zip
 
 # Installing Waypoint
-RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-RUN sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-RUN sudo apt-get update && sudo apt-get install waypoint
+RUN curl -fsSl https://releases.hashicorp.com/waypoint/${WAYPOINT_VERSION}/waypoint_${WAYPOINT_VERSION}_linux_arm64.zip -o waypoint.zip
+RUN unzip waypoint.zip -d /usr/local/bin
+RUN rm waypoint.zip
 
 # Installing ccat (https://github.com/jingweno/ccat)
 RUN go install github.com/jingweno/ccat@latest
@@ -129,17 +129,17 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
 # Kubernetes Tools : kubectl, kubectx, and kubens
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx -O /usr/local/bin/kubectx && chmod +x /usr/local/bin/kubectx
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens -O /usr/local/bin/kubens && chmod +x /usr/local/bin/kubens
-RUN wget https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VER/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
+RUN wget https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VER/bin/linux/arm64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 # Installing Helm
-RUN wget https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz -O /tmp/helm-v$HELM_VERSION-linux-amd64.tar.gz && \
-    tar -zxvf /tmp/helm-v$HELM_VERSION-linux-amd64.tar.gz && \
-    mv linux-amd64/helm /usr/local/bin/helm && \
+RUN wget https://get.helm.sh/helm-v$HELM_VERSION-linux-arm64.tar.gz -O /tmp/helm-v$HELM_VERSION-linux-arm64.tar.gz && \
+    tar -zxvf /tmp/helm-v$HELM_VERSION-linux-arm64.tar.gz && \
+    mv linux-arm64/helm /usr/local/bin/helm && \
     chmod +x /usr/local/bin/helm
 
 # Installing Krew
 RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
-    ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" && \
+    ARCH="$(uname -m | sed -e 's/x86_64/arm4/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" && \
     KREW="krew-${OS}_${ARCH}" && \
     curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" && \
     tar zxvf ${KREW}.tar.gz && \
@@ -147,38 +147,36 @@ RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
     "$KREW" install krew && \
     cp $HOME/.krew/bin/kubectl-krew /usr/local/bin/
 
-# Installing Kubectl 
-RUN kubectl krew install tree
+# Install netshoot kubcetl plugin
+RUN go install github.com/nilic/kubectl-netshoot@latest
 
 # Installing eksctl
-RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
+RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_arm64.tar.gz" | tar xz -C /tmp && \
     mv /tmp/eksctl /usr/local/bin
 
 # Installing calicoctl
 RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
 
 # Installing Azure CLI
-#RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+# RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Installing Sigstore Cosign (https://github.com/sigstore/cosign)
-
-RUN wget https://github.com/sigstore/cosign/releases/download/v1.8.0/cosign-linux-amd64 -O /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
+RUN wget https://github.com/sigstore/cosign/releases/download/v1.8.0/cosign-linux-arm64 -O /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 
 # Installing Snyk CLI
 RUN curl https://static.snyk.io/cli/latest/snyk-linux -o /usr/local/bin/snyk && chmod +x /usr/local/bin/snyk
 
 # Installing AWS CLI v2 + Session Manager + IAM Authenticator
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     sudo ./aws/install
-RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
-    dpkg -i session-manager-plugin.deb 
-RUN curl https://s3.us-west-2.amazonaws.com/amazon-eks/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator -o /usr/local/bin/aws-iam-authenticator && chmod +x /usr/local/bin/aws-iam-authenticator
+RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_arm64/session-manager-plugin.deb" -o "session-manager-plugin.deb" && dpkg -i session-manager-plugin.deb
+RUN curl "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_arm64" -o /usr/local/bin/aws-iam-authenticator && chmod +x /usr/local/bin/aws-iam-authenticator
 
 # Installing Infracost CLI
-RUN wget https://github.com/infracost/infracost/releases/download/v0.10.8/infracost-linux-amd64.tar.gz
-RUN tar xzf infracost-linux-amd64.tar.gz -C /tmp
-RUN mv /tmp/infracost-linux-amd64 /usr/local/bin/infracost
+RUN wget https://github.com/infracost/infracost/releases/download/v0.10.8/infracost-linux-arm64.tar.gz
+RUN tar xzf infracost-linux-arm64.tar.gz -C /tmp
+RUN mv /tmp/infracost-linux-arm64 /usr/local/bin/infracost
 
 # Setting WORKDIR and USER 
 USER root
