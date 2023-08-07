@@ -45,16 +45,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 # Package Versions
 ENV GOLANG_VERSION 1.20.3
 ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
-ENV TERRAFORM_VERSION 1.4.5
-#ENV TECLI_VERSION 0.2.0
-ENV VAULT_VERSION 1.13.0
-ENV CONSUL_VERSION 1.15.0
-ENV PACKER_VERSION 1.8.5
-ENV BOUNDARY_VERSION 0.12.1
+ENV TERRAFORM_VERSION 1.5.2
+ENV VAULT_VERSION 1.14.0
+ENV CONSUL_VERSION 1.16.0
+ENV PACKER_VERSION 1.9.2
+ENV BOUNDARY_VERSION 0.13.0
 ENV WAYPOINT_VERSION 0.11.0
-ENV KUBECTL_VER 1.25.2
-ENV HELM_VERSION 3.8.1
+ENV KUBECTL_VER 1.27.1
+ENV HELM_VERSION 3.12.0
 ENV CALICO_VERSION 3.16.1
+ENV HCDIAG_VERSION 0.5.1
 
 # Installaing Docker CLI & Docker Compose
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -117,6 +117,15 @@ RUN rm consul.zip
 RUN curl -fsSl https://releases.hashicorp.com/waypoint/${WAYPOINT_VERSION}/waypoint_${WAYPOINT_VERSION}_linux_arm64.zip -o waypoint.zip
 RUN unzip waypoint.zip -d /usr/local/bin
 RUN rm waypoint.zip
+
+
+# Installing hcdiag / hcdiag-ext
+RUN curl -fsSl https://releases.hashicorp.com/hcdiag/${HCDIAG_VERSION}/hcdiag_${HCDIAG_VERSION}_linux_arm64.zip -o hcdiag.zip
+RUN unzip hcdiag.zip -d /usr/local/bin
+RUN rm hcdiag.zip
+RUN curl -Lk https://github.com/hashicorp/hcdiag-ext/archive/refs/tags/v0.5.0.zip -o hcdiag-ext-0.5.0.zip
+RUN unzip hcdiag-ext-0.5.0.zip -d /usr/local/bin
+RUN rm hcdiag-ext-0.5.0.zip
 
 # Installing ccat (https://github.com/jingweno/ccat)
 RUN go install github.com/jingweno/ccat@latest
