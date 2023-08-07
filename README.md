@@ -4,17 +4,21 @@
 
 As a rule of thumb, I never install any packages directly onto my Mac unless I absolutely have to. So I created this sample development container that I use with Docker for Mac to be my sole dev environment. There is a breakdown in the Dockerfile of which tools are installed. 
 
-### Packages & Versions
 
-- DOCKER_VERSION 5:20.10.3~3-0~ubuntu-groovy
-- GOLANG_VERSION 1.15.2
-- TERRAFORM_VERSION 0.14.5
-- TECLI_VERSION 0.2.0
-- VAULT_VERSION 1.6.2
-- PACKER_VERSION 1.6.6
-- KUBECTL_VER 1.19.2
-- HELM_VERSION 3.2.0
-- CALICO_VERSION 3.16.1
+### Package Versions
+
+ENV GOLANG_VERSION 1.20.3
+ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
+ENV TERRAFORM_VERSION 1.5.2
+ENV VAULT_VERSION 1.14.0
+ENV CONSUL_VERSION 1.16.0
+ENV PACKER_VERSION 1.9.2
+ENV BOUNDARY_VERSION 0.13.0
+ENV WAYPOINT_VERSION 0.11.0
+ENV KUBECTL_VER 1.27.1
+ENV HELM_VERSION 3.12.0
+ENV CALICO_VERSION 3.16.1
+ENV HCDIAG_VERSION 0.5.1
 
 ### Usage
 
