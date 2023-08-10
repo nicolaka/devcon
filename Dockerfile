@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:lunar
 
 # Installing required packages
 RUN apt-get update -y 
@@ -14,8 +14,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     iputils-ping \
     ssh \
     ansible \
-    netcat \
-    python-setuptools \
+    netcat-traditional \
+    python3-setuptools \
     python3-pip \
     zip \
     unzip \
@@ -31,16 +31,23 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     ca-certificates \
     zsh \
     fonts-powerline \
-    nodejs \
-    npm \ 
     iproute2 \
     file \
     graphviz \
+    pipx \
     less \
     postgresql \
+    httpie \
+    nodejs \
+    npm \
     postgresql-contrib \
     redis \
     && rm -rf /var/lib/apt/lists/*
+
+# Setting up GOPATH. For me, i'm using $HOME/code/go
+ENV HOME /root
+ENV GOPATH $HOME/code/go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 
 # Package Versions
 ENV GOLANG_VERSION 1.20.3
@@ -51,26 +58,19 @@ ENV CONSUL_VERSION 1.16.0
 ENV PACKER_VERSION 1.9.2
 ENV BOUNDARY_VERSION 0.13.0
 ENV WAYPOINT_VERSION 0.11.0
+ENV HCDIAG_VERSION 0.5.1
+ENV HCDIAG_EXT_VERSION 0.5.0
 ENV KUBECTL_VER 1.27.1
 ENV HELM_VERSION 3.12.0
 ENV CALICO_VERSION 3.16.1
-ENV HCDIAG_VERSION 0.5.1
+ENV COSIGN_VERSION 1.8.0
+ENV INFRACOST_VERSION 0.10.28
 
 # Installaing Docker CLI & Docker Compose
 RUN install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
     echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     apt-get update && apt-get -y install docker-ce-cli docker-compose-plugin
-
-# Installing Additional PIP based libraries
-RUN pip install \
-    six \
-    docker \
-    httpie \
-    python-bash-utils \
-    pywinrm \
-    xmltodict \
-    pyOpenSSL==16.2.0 
 
 # Installing + Setting Up GO Environment
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-arm64.tar.gz
@@ -79,19 +79,11 @@ RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 	&& sudo tar -C /usr/local -xzf golang.tar.gz \
 	&& rm golang.tar.gz
 
-# Setting up GOPATH. For me, i'm using $HOME/code/go
-ENV HOME /root
-ENV GOPATH $HOME/code/go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-
 # Installing HashiCorp Stack
 # Installing Terraform 
 RUN curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm64.zip -o terraform.zip
 RUN unzip terraform.zip  -d /usr/local/bin  
 RUN rm terraform.zip
-
-# Installing tecli ( Terraform Cloud/Enterprise CLI)
-#RUN wget https://github.com/awslabs/tecli/releases/download/${TECLI_VERSION}/tecli-linux-arm64 -O /usr/local/bin/tecli && chmod +x /usr/local/bin/tecli
 
 # Installing Vault
 RUN curl https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_arm64.zip -o vault.zip
@@ -118,22 +110,21 @@ RUN curl -fsSl https://releases.hashicorp.com/waypoint/${WAYPOINT_VERSION}/waypo
 RUN unzip waypoint.zip -d /usr/local/bin
 RUN rm waypoint.zip
 
-
 # Installing hcdiag / hcdiag-ext
 RUN curl -fsSl https://releases.hashicorp.com/hcdiag/${HCDIAG_VERSION}/hcdiag_${HCDIAG_VERSION}_linux_arm64.zip -o hcdiag.zip
 RUN unzip hcdiag.zip -d /usr/local/bin
 RUN rm hcdiag.zip
-RUN curl -Lk https://github.com/hashicorp/hcdiag-ext/archive/refs/tags/v0.5.0.zip -o hcdiag-ext-0.5.0.zip
-RUN unzip hcdiag-ext-0.5.0.zip -d /usr/local/bin
-RUN rm hcdiag-ext-0.5.0.zip
+RUN curl -Lk https://github.com/hashicorp/hcdiag-ext/archive/refs/tags/v${HCDIAG_EXT_VERSION}.zip -o hcdiag-ext-${HCDIAG_EXT_VERSION}.zip
+RUN unzip hcdiag-ext-${HCDIAG_EXT_VERSION}.zip -d /usr/local/bin
+RUN rm hcdiag-ext-${HCDIAG_EXT_VERSION}.zip
+
+# Install netshoot kubcetl plugin
+RUN go install github.com/nilic/kubectl-netshoot@latest
 
 # Installing ccat (https://github.com/jingweno/ccat)
 RUN go install github.com/jingweno/ccat@latest
 # Installing CFSSL (https://github.com/cloudflare/cfssl)
 RUN go install github.com/cloudflare/cfssl/cmd/cfssl@latest
-
-# Installing gcloud
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && apt-get update -y && apt-get install google-cloud-sdk -y
 
 # Kubernetes Tools : kubectl, kubectx, and kubens
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx -O /usr/local/bin/kubectx && chmod +x /usr/local/bin/kubectx
@@ -155,22 +146,18 @@ RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
     KREW=./krew-"${OS}_${ARCH}" && \
     "$KREW" install krew && \
     cp $HOME/.krew/bin/kubectl-krew /usr/local/bin/
-
-# Install netshoot kubcetl plugin
-RUN go install github.com/nilic/kubectl-netshoot@latest
-
 # Installing eksctl
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_arm64.tar.gz" | tar xz -C /tmp && \
     mv /tmp/eksctl /usr/local/bin
 
-# Installing calicoctl
-RUN wget https://github.com/projectcalico/calicoctl/releases/download/v$CALICO_VERSION/calicoctl -O /usr/local/bin/calicoctl && chmod +x /usr/local/bin/calicoctl
-
+# Installing gcloud
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && apt-get update -y && apt-get install google-cloud-cli -y
+      
 # Installing Azure CLI
-# RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Installing Sigstore Cosign (https://github.com/sigstore/cosign)
-RUN wget https://github.com/sigstore/cosign/releases/download/v1.8.0/cosign-linux-arm64 -O /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
+RUN wget https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-arm64 -O /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 
 # Installing Snyk CLI
 RUN curl https://static.snyk.io/cli/latest/snyk-linux -o /usr/local/bin/snyk && chmod +x /usr/local/bin/snyk
@@ -183,7 +170,7 @@ RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubunt
 RUN curl "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_arm64" -o /usr/local/bin/aws-iam-authenticator && chmod +x /usr/local/bin/aws-iam-authenticator
 
 # Installing Infracost CLI
-RUN wget https://github.com/infracost/infracost/releases/download/v0.10.8/infracost-linux-arm64.tar.gz
+RUN wget https://github.com/infracost/infracost/releases/download/v${INFRACOST_VERSION}/infracost-linux-arm64.tar.gz
 RUN tar xzf infracost-linux-arm64.tar.gz -C /tmp
 RUN mv /tmp/infracost-linux-arm64 /usr/local/bin/infracost
 
