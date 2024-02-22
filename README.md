@@ -6,7 +6,7 @@ As a rule of thumb, I never install any packages directly onto my Mac unless I a
 
 
 ### Package Versions
-
+```
 ENV GOLANG_VERSION 1.20.3
 ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
 ENV TERRAFORM_VERSION 1.6.6
@@ -22,7 +22,7 @@ ENV HELM_VERSION 3.12.0
 ENV CALICO_VERSION 3.16.1
 ENV COSIGN_VERSION 1.8.0
 ENV INFRACOST_VERSION 0.10.28
-
+```
 ### Usage
 
 ```
