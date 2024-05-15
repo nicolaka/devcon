@@ -52,16 +52,16 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 # Package Versions
 ENV GOLANG_VERSION 1.20.3
 ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
-ENV TERRAFORM_VERSION 1.8.0
+ENV TERRAFORM_VERSION 1.8.3
 ENV VAULT_VERSION 1.16.1
-ENV CONSUL_VERSION 1.16.0
-ENV PACKER_VERSION 1.10.0
-ENV BOUNDARY_VERSION 0.15.0
+ENV CONSUL_VERSION 1.18.1
+ENV PACKER_VERSION 1.10.3
+ENV BOUNDARY_VERSION 0.16.0
 ENV WAYPOINT_VERSION 0.11.4
 ENV HCDIAG_VERSION 0.5.1
 ENV HCDIAG_EXT_VERSION 0.5.0
 ENV KUBECTL_VER 1.28.2
-ENV HELM_VERSION 3.12.0
+ENV HELM_VERSION 3.14.4
 ENV CALICO_VERSION 3.16.1
 ENV COSIGN_VERSION 1.8.0
 ENV INFRACOST_VERSION 0.10.28
@@ -92,12 +92,12 @@ RUN rm vault.zip
 
 # Installing Packer
 RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_arm64.zip -o packer.zip
-RUN unzip packer.zip -d /usr/local/bin
+RUN unzip -u packer.zip -d /usr/local/bin
 RUN rm packer.zip
 
 # Installing Boundary
 RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_arm64.zip -o boundary.zip
-RUN unzip boundary.zip -d /usr/local/bin
+RUN unzip -u boundary.zip -d /usr/local/bin
 RUN rm boundary.zip
 
 # Installing Consul 
