@@ -50,21 +50,21 @@ ENV GOPATH $HOME/code/go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 
 # Package Versions
-ENV GOLANG_VERSION 1.20.3
-ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
-ENV TERRAFORM_VERSION 1.6.6
-ENV VAULT_VERSION 1.15.4
-ENV CONSUL_VERSION 1.16.0
-ENV PACKER_VERSION 1.10.0
-ENV BOUNDARY_VERSION 0.14.3
+ENV GOLANG_VERSION 1.23.2
+ENV GOLANG_DOWNLOAD_SHA256 f626cdd92fc21a88b31c1251f419c17782933a42903db87a174ce74eeecc66a9
+ENV TERRAFORM_VERSION 1.9.7
+ENV VAULT_VERSION 1.18.0+ent
+ENV CONSUL_VERSION 1.19.2+ent
+ENV PACKER_VERSION 1.11.2
+ENV BOUNDARY_VERSION 0.17.1+ent
 ENV WAYPOINT_VERSION 0.11.4
 ENV HCDIAG_VERSION 0.5.1
 ENV HCDIAG_EXT_VERSION 0.5.0
-ENV KUBECTL_VER 1.27.1
-ENV HELM_VERSION 3.12.0
-ENV CALICO_VERSION 3.16.1
-ENV COSIGN_VERSION 1.8.0
-ENV INFRACOST_VERSION 0.10.28
+ENV KUBECTL_VER 1.31.0
+ENV HELM_VERSION 3.14.0
+ENV CALICO_VERSION 3.28.2
+ENV COSIGN_VERSION 2.4.0
+ENV INFRACOST_VERSION 0.10.36
 
 # Installaing Docker CLI & Docker Compose
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -87,35 +87,35 @@ RUN rm terraform.zip
 
 # Installing Vault
 RUN curl https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_arm64.zip -o vault.zip
-RUN unzip vault.zip  -d /usr/local/bin  
+RUN unzip -o vault.zip  -d /usr/local/bin  
 RUN rm vault.zip
 
 # Installing Packer
 RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_arm64.zip -o packer.zip
-RUN unzip packer.zip -d /usr/local/bin
+RUN unzip -o packer.zip -d /usr/local/bin
 RUN rm packer.zip
 
 # Installing Boundary
 RUN curl https://releases.hashicorp.com/boundary/${BOUNDARY_VERSION}/boundary_${BOUNDARY_VERSION}_linux_arm64.zip -o boundary.zip
-RUN unzip boundary.zip -d /usr/local/bin
+RUN unzip -o boundary.zip -d /usr/local/bin
 RUN rm boundary.zip
 
 # Installing Consul 
 RUN curl https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_arm64.zip -o consul.zip
-RUN unzip consul.zip -d /usr/local/bin
+RUN unzip -o consul.zip -d /usr/local/bin
 RUN rm consul.zip
 
 # Installing Waypoint
 RUN curl -fsSl https://releases.hashicorp.com/waypoint/${WAYPOINT_VERSION}/waypoint_${WAYPOINT_VERSION}_linux_arm64.zip -o waypoint.zip
-RUN unzip waypoint.zip -d /usr/local/bin
+RUN unzip -o waypoint.zip -d /usr/local/bin
 RUN rm waypoint.zip
 
 # Installing hcdiag / hcdiag-ext
 RUN curl -fsSl https://releases.hashicorp.com/hcdiag/${HCDIAG_VERSION}/hcdiag_${HCDIAG_VERSION}_linux_arm64.zip -o hcdiag.zip
-RUN unzip hcdiag.zip -d /usr/local/bin
+RUN unzip -o hcdiag.zip -d /usr/local/bin
 RUN rm hcdiag.zip
 RUN curl -Lk https://github.com/hashicorp/hcdiag-ext/archive/refs/tags/v${HCDIAG_EXT_VERSION}.zip -o hcdiag-ext-${HCDIAG_EXT_VERSION}.zip
-RUN unzip hcdiag-ext-${HCDIAG_EXT_VERSION}.zip -d /usr/local/bin
+RUN unzip -o hcdiag-ext-${HCDIAG_EXT_VERSION}.zip -d /usr/local/bin
 RUN rm hcdiag-ext-${HCDIAG_EXT_VERSION}.zip
 
 # Install netshoot kubcetl plugin
