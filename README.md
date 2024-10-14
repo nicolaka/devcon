@@ -32,25 +32,32 @@ If you have Docker Desktop installed, you can run the following command to start
 ```
 $ docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock cesteban29/devcon:latest
 ```
-Explanation of Each Part:
 
-	1.	docker run:
-This is the main Docker command to run a container from an image.
-	2.	-it:
-	•	-i (interactive): Keeps STDIN open, allowing you to interact with the container (e.g., use the terminal within the container).
-	•	-t (tty): Allocates a pseudo-TTY (terminal) so you can use it like a regular terminal.
-	3.	--rm:
-Automatically removes the container when it exits. This ensures that the container doesn’t persist on your system after it’s done running, cleaning up resources after the run.
-	4.	--hostname devcon:
-This sets the hostname of the container to devcon. Inside the container, it will identify itself with the hostname devcon.
-  5. -v $(pwd):/app:
-$(pwd) refers to the current working directory (where you executed the docker run command) on the host machine.
-/app is the directory inside the container where the current directory will be mounted. You can replace /app with any desired path inside the container.
-	6.	-v /var/run/docker.sock:/var/run/docker.sock:
-This mounts the Docker socket from the host machine (/var/run/docker.sock) into the container at the same location (/var/run/docker.sock). This allows the container to communicate with the Docker daemon running on the host machine.
-In practical terms, this gives the container access to the host’s Docker engine, enabling the container to run and manage Docker commands or even spawn other Docker containers as if it were running directly on the host
-  7.  cesteban29/devcon:latest:
-This specifies the image to use for the container. In this case, it’s the latest version of the devcon image created by the user cesteban29 stored in Docker Hub.
+### Explanation of Each Part:
+
+1. **`docker run`**:  
+   This is the main Docker command to run a container from an image.
+
+2. **`-it`**:  
+   - `-i` (interactive): Keeps STDIN open, allowing you to interact with the container (e.g., use the terminal within the container).  
+   - `-t` (tty): Allocates a pseudo-TTY (terminal) so you can use it like a regular terminal.
+
+3. **`--rm`**:  
+   Automatically removes the container when it exits. This ensures that the container doesn’t persist on your system after it’s done running, cleaning up resources after the run.
+
+4. **`--hostname devcon`**:  
+   This sets the hostname of the container to `devcon`. Inside the container, it will identify itself with the hostname `devcon`.
+
+5. **`-v $(pwd):/app`**:  
+   - `$(pwd)` refers to the current working directory (where you executed the `docker run` command) on the host machine.  
+   - `/app` is the directory inside the container where the current directory will be mounted. You can replace `/app` with any desired path inside the container.
+
+6. **`-v /var/run/docker.sock:/var/run/docker.sock`**:  
+   This mounts the Docker socket from the host machine (`/var/run/docker.sock`) into the container at the same location (`/var/run/docker.sock`). This allows the container to communicate with the Docker daemon running on the host machine.  
+   In practical terms, this gives the container access to the host’s Docker engine, enabling the container to run and manage Docker commands or even spawn other Docker containers as if it were running directly on the host.
+
+7. **`cesteban29/devcon:latest`**:  
+   This specifies the image to use for the container. In this case, it’s the latest version of the `devcon` image created by the user `cesteban29` stored in Docker Hub.
 
 ### Build new image
 
