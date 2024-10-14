@@ -69,9 +69,6 @@ $ docker push yourusername/devcon:latest
 ```
 
 
-![img](devcon.png)
-
-
 
  
 
