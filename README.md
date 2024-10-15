@@ -26,11 +26,18 @@ ENV CALICO_VERSION 3.28.2
 ENV COSIGN_VERSION 2.4.0
 ENV INFRACOST_VERSION 0.10.36
 ```
-### Usage
+## Instructions
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+2. Add the alias shortcut to your `.zshrc` file
+3. Run `devcon` from anywhere on your host machine and it will mount the current directory, Docker socket, and Kubernetes configuration files into the container
+
+## Details
+### Command
 If you have Docker Desktop installed, you can run the following command to start the container from image `cesteban29/devcon:latest` found on Docker Hub:
 
 ```
-$ docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock cesteban29/devcon:latest
+$ docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube cesteban29/devcon:latest
 ```
 
 ### Explanation of Each Part:
@@ -56,7 +63,10 @@ $ docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/
    This mounts the Docker socket from the host machine (`/var/run/docker.sock`) into the container at the same location (`/var/run/docker.sock`). This allows the container to communicate with the Docker daemon running on the host machine.  
    In practical terms, this gives the container access to the host’s Docker engine, enabling the container to run and manage Docker commands or even spawn other Docker containers as if it were running directly on the host.
 
-7. **`cesteban29/devcon:latest`**:  
+7. **`-v ~/.kube:/root/.kube`**:  
+   This mounts the host machine's `.kube` directory into the container at the same location (`/root/.kube`). This allows the container to access the Kubernetes configuration files and use `kubectl` commands.
+
+8. **`cesteban29/devcon:latest`**:  
    This specifies the image to use for the container. In this case, it’s the latest version of the `devcon` image created by the user `cesteban29` stored in Docker Hub.
 
 ### Build new image
@@ -74,6 +84,29 @@ $ docker login
 $ docker build -t yourusername/devcon:latest .
 $ docker push yourusername/devcon:latest
 ```
+
+### Alias Shortcut in .zshrc
+
+Add the following to your `.zshrc` file:
+
+```
+alias devcon="docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube cesteban29/devcon:latest"
+```
+
+This allows you to run `devcon` from any directory on your host machine, and it will automatically mount the current directory, the Docker socket, and your Kubernetes configuration files into the container!
+
+Make sure to reload your `.zshrc` file:
+
+```
+$ source ~/.zshrc
+```
+
+Now you can start the container with:
+
+```
+$ devcon
+```
+
 
 
 
