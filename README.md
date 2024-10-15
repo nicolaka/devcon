@@ -29,7 +29,10 @@ ENV INFRACOST_VERSION 0.10.36
 ## Instructions
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-2. Add the alias shortcut to your `.zshrc` file
+2. Add the alias shortcut to your `.zshrc` file (or `.bashrc` if you're using Bash)
+```
+alias devcon="docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube cesteban29/devcon:latest"
+```
 3. Run `devcon` from anywhere on your host machine and it will mount the current directory, Docker socket, and Kubernetes configuration files into the container
 
 ## Details
