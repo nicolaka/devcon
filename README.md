@@ -31,7 +31,13 @@ ENV INFRACOST_VERSION 0.10.36
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 2. Add the alias shortcut to your `.zshrc` file (or `.bashrc` if you're using Bash)
 ```
-alias devcon="docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube cesteban29/devcon:latest"
+alias devcon='docker run -it --rm \
+  --hostname devcon \
+  -v $(pwd):/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.kube:/root/.kube:ro \
+  carlosdev29/devcon:latest \
+  bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"'
 ```
 3. Run `devcon` from anywhere on your host machine and it will mount the current directory, Docker socket, and Kubernetes configuration files into the container
 
@@ -93,10 +99,17 @@ $ docker push yourusername/devcon:latest
 Add the following to your `.zshrc` file:
 
 ```
-alias devcon="docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube cesteban29/devcon:latest"
+alias devcon='docker run -it --rm \
+  --hostname devcon \
+  -v $(pwd):/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.kube:/root/.kube:ro \
+  carlosdev29/devcon:latest \
+  bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"'
 ```
 
-This allows you to run `devcon` from any directory on your host machine, and it will automatically mount the current directory, the Docker socket, and your Kubernetes configuration files into the container!
+This allows you to run `devcon` from any directory on your host machine, and it will automatically mount the current directory, the Docker socket, and your Kubernetes configuration files into the container! 
+
 
 Make sure to reload your `.zshrc` file:
 
@@ -110,8 +123,26 @@ Now you can start the container with:
 $ devcon
 ```
 
+## Errors Found
+### Accessing Kubernetes API from Docker Containers on macOS/Windows
 
+When running **Kubernetes** via **Docker Desktop** on macOS or Windows, accessing the Kubernetes API server from within a **Docker container** can present some challenges due to how network namespaces work between the host machine and containers. This document explains why and how we resolved these issues.
 
+#### Problem: Why Replace `127.0.0.1`?
 
- 
+When you interact with the **Kubernetes API** on your host machine using **kubectl**, the **Kubeconfig** often points to `127.0.0.1`, which is the **loopback address** or **localhost**. This works fine when running commands directly on the host, but not when you're inside a **Docker container**.
+
+##### Inside a Docker Container:
+- **`127.0.0.1`** or **localhost** refers to the **container itself**, not the host machine. 
+- Since the **Kubernetes API server** is running on the **host machine** (via Docker Desktop), attempting to reach `127.0.0.1` inside the container will fail because it's trying to connect to the container's own network, not the host's.
+
+#### Solution: Use `kubernetes.docker.internal`
+
+To solve this, **Docker** provides a special hostname, **`kubernetes.docker.internal`**, that allows containers to access the **host machine’s services**, including the Kubernetes API server.
+
+By replacing `127.0.0.1` in your **Kubeconfig** with `kubernetes.docker.internal`, the container can now access the Kubernetes API server running on your host through Docker Desktop.
+   
+   ```bash
+   sed -i.bak 's/127.0.0.1/kubernetes.docker.internal/g' /root/.kube/config
+   ```
 
