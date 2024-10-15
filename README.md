@@ -46,7 +46,13 @@ alias devcon='docker run -it --rm \
 If you have Docker Desktop installed, you can run the following command to start the container from image `cesteban29/devcon:latest` found on Docker Hub:
 
 ```
-$ docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube cesteban29/devcon:latest
+$ docker run -it --rm \
+  --hostname devcon \
+  -v $(pwd):/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.kube:/root/.kube:ro \
+  carlosdev29/devcon:latest \
+  bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"
 ```
 
 ### Explanation of Each Part:
@@ -77,6 +83,9 @@ $ docker run -it --rm --hostname devcon -v $(pwd):/app -v /var/run/docker.sock:/
 
 8. **`cesteban29/devcon:latest`**:  
    This specifies the image to use for the container. In this case, it’s the latest version of the `devcon` image created by the user `cesteban29` stored in Docker Hub.
+
+9. **`bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"`**:  
+   This runs a command inside the container to replace `127.0.0.1` with `kubernetes.docker.internal` in the Kubernetes configuration file. This is necessary because the Kubernetes API server is running on the host machine, not inside the container. More more info look at the [Errors Found](#errors-found) section.
 
 ### Build new image
 
