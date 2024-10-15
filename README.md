@@ -85,7 +85,7 @@ $ docker run -it --rm \
    This specifies the image to use for the container. In this case, it’s the latest version of the `devcon` image created by the user `cesteban29` stored in Docker Hub.
 
 9. **`bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"`**:  
-   This runs a command inside the container to replace `127.0.0.1` with `kubernetes.docker.internal` in the Kubernetes configuration file. This is necessary because the Kubernetes API server is running on the host machine, not inside the container. More more info look at the [Errors Found](#errors-found) section.
+   This runs a command inside the container to replace `127.0.0.1` with `kubernetes.docker.internal` in the Kubernetes configuration file. This is necessary because the Kubernetes API server is running on the host machine, not inside the container. For more info look at the [Errors Found](#errors-found) section.
 
 ### Build new image
 
