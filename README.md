@@ -8,15 +8,16 @@ The Dockerfile contains a breakdown of which tools are installed.
 Shoutout to Nico Kabar for the inspiration and guidance to create my own version of his DevCon
 
 
-## Package Versions - updated 10/14/2024
+## Package Versions - updated 10/17/2024
 ```
 ENV GOLANG_VERSION 1.23.2
 ENV GOLANG_DOWNLOAD_SHA256 f626cdd92fc21a88b31c1251f419c17782933a42903db87a174ce74eeecc66a9
-ENV TERRAFORM_VERSION 1.9.7
+ENV TERRAFORM_VERSION 1.9.8
 ENV VAULT_VERSION 1.18.0+ent
-ENV CONSUL_VERSION 1.19.2+ent
+ENV CONSUL_VERSION 1.20.0+ent
+ENV NOMAD_VERSION 1.9.0+ent
 ENV PACKER_VERSION 1.11.2
-ENV BOUNDARY_VERSION 0.17.1+ent
+ENV BOUNDARY_VERSION 0.18.0+ent
 ENV WAYPOINT_VERSION 0.11.4
 ENV HCDIAG_VERSION 0.5.1
 ENV HCDIAG_EXT_VERSION 0.5.0
