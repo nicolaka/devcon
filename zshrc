@@ -67,7 +67,6 @@ plugins=(
   jsontools
   macports
   node
-  osx
   sudo
   docker
 )
