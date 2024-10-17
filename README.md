@@ -33,6 +33,7 @@ ENV INFRACOST_VERSION 0.10.36
 ```
 alias devcon='docker run -it --rm \
   --hostname devcon \
+  -w /app \
   -v $(pwd):/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.kube:/root/.kube:ro \
@@ -48,6 +49,7 @@ If you have Docker Desktop installed, you can run the following command to start
 ```
 $ docker run -it --rm \
   --hostname devcon \
+  -w /app \
   -v $(pwd):/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.kube:/root/.kube:ro \
@@ -70,21 +72,24 @@ $ docker run -it --rm \
 4. **`--hostname devcon`**:  
    This sets the hostname of the container to `devcon`. Inside the container, it will identify itself with the hostname `devcon`.
 
-5. **`-v $(pwd):/app`**:  
+5. **`-w /app`**:  
+   This sets the working directory inside the container to `/app`. This is where the container will look for files to work with if no other directory is specified.
+
+6. **`-v $(pwd):/app`**:  
    - `$(pwd)` refers to the current working directory (where you executed the `docker run` command) on the host machine.  
    - `/app` is the directory inside the container where the current directory will be mounted. You can replace `/app` with any desired path inside the container.
 
-6. **`-v /var/run/docker.sock:/var/run/docker.sock`**:  
+7. **`-v /var/run/docker.sock:/var/run/docker.sock`**:  
    This mounts the Docker socket from the host machine (`/var/run/docker.sock`) into the container at the same location (`/var/run/docker.sock`). This allows the container to communicate with the Docker daemon running on the host machine.  
    In practical terms, this gives the container access to the host’s Docker engine, enabling the container to run and manage Docker commands or even spawn other Docker containers as if it were running directly on the host.
 
-7. **`-v ~/.kube:/root/.kube`**:  
+8. **`-v ~/.kube:/root/.kube`**:  
    This mounts the host machine's `.kube` directory into the container at the same location (`/root/.kube`). This allows the container to access the Kubernetes configuration files and use `kubectl` commands.
 
-8. **`cesteban29/devcon:latest`**:  
+9. **`cesteban29/devcon:latest`**:  
    This specifies the image to use for the container. In this case, it’s the latest version of the `devcon` image created by the user `cesteban29` stored in Docker Hub.
 
-9. **`bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"`**:  
+10. **`bash -c "sed -i.bak '\''s/127.0.0.1/kubernetes.docker.internal/g'\'' /root/.kube/config && exec zsh"`**:  
    This runs a command inside the container to replace `127.0.0.1` with `kubernetes.docker.internal` in the Kubernetes configuration file. This is necessary because the Kubernetes API server is running on the host machine, not inside the container. For more info look at the [Errors Found](#errors-found) section.
 
 ### Build new image
@@ -110,6 +115,7 @@ Add the following to your `.zshrc` file:
 ```
 alias devcon='docker run -it --rm \
   --hostname devcon \
+  -w /app \
   -v $(pwd):/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.kube:/root/.kube:ro \

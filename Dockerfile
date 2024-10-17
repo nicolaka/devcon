@@ -54,7 +54,8 @@ ENV GOLANG_VERSION 1.23.2
 ENV GOLANG_DOWNLOAD_SHA256 f626cdd92fc21a88b31c1251f419c17782933a42903db87a174ce74eeecc66a9
 ENV TERRAFORM_VERSION 1.9.7
 ENV VAULT_VERSION 1.18.0+ent
-ENV CONSUL_VERSION 1.19.2+ent
+ENV CONSUL_VERSION 1.20.0+ent
+ENV NOMAD_VERSION 1.9.0+ent
 ENV PACKER_VERSION 1.11.2
 ENV BOUNDARY_VERSION 0.17.1+ent
 ENV WAYPOINT_VERSION 0.11.4
@@ -104,6 +105,11 @@ RUN rm boundary.zip
 RUN curl https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_arm64.zip -o consul.zip
 RUN unzip -o consul.zip -d /usr/local/bin
 RUN rm consul.zip
+
+# Installing Nomad
+RUN curl https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_arm64.zip -o nomad.zip
+RUN unzip -o nomad.zip -d /usr/local/bin
+RUN rm nomad.zip
 
 # Installing Waypoint
 RUN curl -fsSl https://releases.hashicorp.com/waypoint/${WAYPOINT_VERSION}/waypoint_${WAYPOINT_VERSION}_linux_arm64.zip -o waypoint.zip
