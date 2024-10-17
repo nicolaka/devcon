@@ -1,0 +1,32 @@
+name: Build Devcon Docker Image
+
+on:
+  push:
+    paths: # This is the path to the packer image
+      - './Dockerfile'
+  workflow_dispatch: #Allows you to manually trigger the workflow from the GitHub Actions tab
+
+jobs:
+  build-devcon-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/devcon:latest
