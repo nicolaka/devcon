@@ -52,11 +52,12 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 # Package Versions
 ENV GOLANG_VERSION=1.23.1
 ENV GOLANG_DOWNLOAD_SHA256=faec7f7f8ae53fda0f3d408f52182d942cc89ef5b7d3d9f23ff117437d4b2d2f
-ENV TERRAFORM_VERSION=1.9.6
-ENV VAULT_VERSION=1.17.6
+ENV TERRAFORM_VERSION=1.10.0-beta1
+ENV TERRAFORM_STACKS_VERSION=0.5.1
+ENV VAULT_VERSION=1.18.1
 ENV CONSUL_VERSION=1.18.1
-ENV PACKER_VERSION=1.10.3
-ENV BOUNDARY_VERSION=0.16.1
+ENV PACKER_VERSION=1.11.2
+ENV BOUNDARY_VERSION=0.18.0
 ENV WAYPOINT_VERSION=0.11.4
 ENV HCDIAG_VERSION=0.5.1
 ENV HCDIAG_EXT_VERSION=0.5.0
@@ -84,6 +85,11 @@ RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 RUN curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm64.zip -o terraform.zip
 RUN unzip -o terraform.zip  -d /usr/local/bin  
 RUN rm terraform.zip
+
+# Installing Terraform Stacks
+RUN curl https://releases.hashicorp.com/tfstacks/${TERRAFORM_STACKS_VERSION}/tfstacks_${TERRAFORM_STACKS_VERSION}_linux_arm64.zip -o tfstacks.zip
+RUN unzip -o tfstacks.zip  -d /usr/local/bin  
+RUN rm tfstacks.zip
 
 # Installing Vault
 RUN curl https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_arm64.zip -o vault.zip
