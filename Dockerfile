@@ -1,4 +1,4 @@
-FROM ubuntu:lunar
+FROM ubuntu:noble
 
 # Installing required packages
 RUN apt-get update -y 
@@ -52,12 +52,12 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 # Package Versions
 ENV GOLANG_VERSION=1.23.1
 ENV GOLANG_DOWNLOAD_SHA256=faec7f7f8ae53fda0f3d408f52182d942cc89ef5b7d3d9f23ff117437d4b2d2f
-ENV TERRAFORM_VERSION=1.10.0-beta1
-ENV TERRAFORM_STACKS_VERSION=0.5.1
+ENV TERRAFORM_VERSION=1.10.2
+ENV TERRAFORM_STACKS_VERSION=0.6.0
 ENV VAULT_VERSION=1.18.1
-ENV CONSUL_VERSION=1.18.1
+ENV CONSUL_VERSION=1.20.1
 ENV PACKER_VERSION=1.11.2
-ENV BOUNDARY_VERSION=0.18.0
+ENV BOUNDARY_VERSION=0.18.2
 ENV WAYPOINT_VERSION=0.11.4
 ENV HCDIAG_VERSION=0.5.1
 ENV HCDIAG_EXT_VERSION=0.5.0
@@ -157,8 +157,8 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
     mv /tmp/eksctl /usr/local/bin
 
 # Installing gcloud
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && apt-get update -y && apt-get install google-cloud-cli -y
-      
+RUN curl https://sdk.cloud.google.com | bash
+    
 # Installing Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
