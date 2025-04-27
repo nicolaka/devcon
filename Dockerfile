@@ -52,16 +52,16 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 # Package Versions
 ENV GOLANG_VERSION=1.23.1
 ENV GOLANG_DOWNLOAD_SHA256=faec7f7f8ae53fda0f3d408f52182d942cc89ef5b7d3d9f23ff117437d4b2d2f
-ENV TERRAFORM_VERSION=1.10.2
-ENV TERRAFORM_STACKS_VERSION=0.6.0
-ENV VAULT_VERSION=1.18.1
+ENV TERRAFORM_VERSION=1.11.4
+ENV TERRAFORM_STACKS_VERSION=0.6.1
+ENV VAULT_VERSION=1.19.2
 ENV CONSUL_VERSION=1.20.1
-ENV PACKER_VERSION=1.11.2
+ENV PACKER_VERSION=1.12.0
 ENV BOUNDARY_VERSION=0.18.2
 ENV WAYPOINT_VERSION=0.11.4
 ENV HCDIAG_VERSION=0.5.1
 ENV HCDIAG_EXT_VERSION=0.5.0
-ENV KUBECTL_VER=1.30.2
+ENV KUBECTL_VER=1.32.2
 ENV HELM_VERSION=3.14.4
 ENV CALICO_VERSION=3.16.1
 ENV COSIGN_VERSION=1.8.0
@@ -156,9 +156,12 @@ RUN OS="$(uname | tr '[:upper:]' '[:lower:]')" && \
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_arm64.tar.gz" | tar xz -C /tmp && \
     mv /tmp/eksctl /usr/local/bin
 
-# Installing gcloud
-RUN curl https://sdk.cloud.google.com | bash
-    
+# Installing gcloud sdk
+RUN wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-arm.tar.gz -O /tmp/google-cloud-cli-linux-arm.tar.gz && \
+    tar -zxvf /tmp/google-cloud-cli-linux-arm.tar.gz 
+ENV PATH=$PATH:$HOME/google-cloud-sdk/bin
+
+
 # Installing Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
@@ -179,6 +182,11 @@ RUN curl "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/down
 RUN wget https://github.com/infracost/infracost/releases/download/v${INFRACOST_VERSION}/infracost-linux-arm64.tar.gz
 RUN tar xzf infracost-linux-arm64.tar.gz -C /tmp
 RUN mv /tmp/infracost-linux-arm64 /usr/local/bin/infracost
+
+# Installing Github CLI
+RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+RUN sudo apt-add-repository https://cli.github.com/packages
+RUN sudo apt install gh
 
 # Setting WORKDIR and USER 
 USER root
