@@ -52,7 +52,7 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 # Package Versions
 ENV GOLANG_VERSION=1.23.1
 ENV GOLANG_DOWNLOAD_SHA256=faec7f7f8ae53fda0f3d408f52182d942cc89ef5b7d3d9f23ff117437d4b2d2f
-ENV TERRAFORM_VERSION=1.11.4
+ENV TERRAFORM_VERSION=1.12.1
 ENV TERRAFORM_STACKS_VERSION=0.6.1
 ENV VAULT_VERSION=1.19.2
 ENV CONSUL_VERSION=1.20.1
@@ -61,7 +61,7 @@ ENV BOUNDARY_VERSION=0.18.2
 ENV WAYPOINT_VERSION=0.11.4
 ENV HCDIAG_VERSION=0.5.1
 ENV HCDIAG_EXT_VERSION=0.5.0
-ENV KUBECTL_VER=1.32.2
+ENV KUBECTL_VER=1.33.0
 ENV HELM_VERSION=3.14.4
 ENV CALICO_VERSION=3.16.1
 ENV COSIGN_VERSION=1.8.0
@@ -135,7 +135,7 @@ RUN go install github.com/cloudflare/cfssl/cmd/cfssl@latest
 # Kubernetes Tools : kubectl, kubectx, and kubens
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx -O /usr/local/bin/kubectx && chmod +x /usr/local/bin/kubectx
 RUN wget https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens -O /usr/local/bin/kubens && chmod +x /usr/local/bin/kubens
-RUN wget https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VER/bin/linux/arm64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
+RUN wget https://dl.k8s.io/release/v$KUBECTL_VER/bin/linux/arm64/kubectl -O /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 # Installing Helm
 RUN wget https://get.helm.sh/helm-v$HELM_VERSION-linux-arm64.tar.gz -O /tmp/helm-v$HELM_VERSION-linux-arm64.tar.gz && \
