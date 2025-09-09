@@ -42,6 +42,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     npm \
     postgresql-contrib \
     redis \
+    pipx \
     && rm -rf /var/lib/apt/lists/*
 
 # Setting up GOPATH. For me, i'm using $HOME/code/go
@@ -52,15 +53,14 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH:$HOME/.local/bin
 # Package Versions
 ENV GOLANG_VERSION=1.23.1
 ENV GOLANG_DOWNLOAD_SHA256=faec7f7f8ae53fda0f3d408f52182d942cc89ef5b7d3d9f23ff117437d4b2d2f
-ENV TERRAFORM_VERSION=1.12.1
+ENV TERRAFORM_VERSION=1.13.1
 ENV TERRAFORM_STACKS_VERSION=0.6.1
-ENV VAULT_VERSION=1.19.2
+ENV VAULT_VERSION=1.20.3
 ENV CONSUL_VERSION=1.20.1
-ENV PACKER_VERSION=1.12.0
+ENV PACKER_VERSION=1.14.2
 ENV BOUNDARY_VERSION=0.18.2
 ENV WAYPOINT_VERSION=0.11.4
-ENV HCDIAG_VERSION=0.5.1
-ENV HCDIAG_EXT_VERSION=0.5.0
+ENV RADAR_VERSION=0.32.0
 ENV KUBECTL_VER=1.33.0
 ENV HELM_VERSION=3.14.4
 ENV CALICO_VERSION=3.16.1
@@ -116,13 +116,11 @@ RUN curl -fsSl https://releases.hashicorp.com/waypoint/${WAYPOINT_VERSION}/waypo
 RUN unzip -o waypoint.zip -d /usr/local/bin
 RUN rm waypoint.zip
 
-# Installing hcdiag / hcdiag-ext
-RUN curl -fsSl https://releases.hashicorp.com/hcdiag/${HCDIAG_VERSION}/hcdiag_${HCDIAG_VERSION}_linux_arm64.zip -o hcdiag.zip
-RUN unzip hcdiag.zip -d /usr/local/bin
-RUN rm hcdiag.zip
-RUN curl -Lk https://github.com/hashicorp/hcdiag-ext/archive/refs/tags/v${HCDIAG_EXT_VERSION}.zip -o hcdiag-ext-${HCDIAG_EXT_VERSION}.zip
-RUN unzip hcdiag-ext-${HCDIAG_EXT_VERSION}.zip -d /usr/local/bin
-RUN rm hcdiag-ext-${HCDIAG_EXT_VERSION}.zip
+
+# Installing Radar
+RUN curl -fsSl https://releases.hashicorp.com/vault-radar/${RADAR_VERSION}/vault-radar_${RADAR_VERSION}_linux_arm64.zip -o vault-radar.zip
+RUN unzip vault-radar.zip -d /usr/local/bin
+RUN rm vault-radar.zip
 
 # Install netshoot kubcetl plugin
 RUN go install github.com/nilic/kubectl-netshoot@latest
