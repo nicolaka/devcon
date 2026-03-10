@@ -43,6 +43,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     postgresql-contrib \
     redis \
     pipx \
+    zstd \
     && rm -rf /var/lib/apt/lists/*
 
 # Setting up GOPATH. For me, i'm using $HOME/code/go
@@ -185,6 +186,13 @@ RUN mv /tmp/infracost-linux-arm64 /usr/local/bin/infracost
 RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
 RUN sudo apt-add-repository https://cli.github.com/packages
 RUN sudo apt install gh
+
+# Claude Code
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
+# Ollama
+RUN curl -fsSL https://ollama.com/install.sh | sh
+ENV OLLAMA_HOST=host.docker.internal:11434
 
 # Setting WORKDIR and USER 
 USER root

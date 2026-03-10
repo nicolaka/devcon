@@ -33,6 +33,33 @@ $ docker run -it --rm --hostname devcon -v /var/run/docker.sock:/var/run/docker.
 
 Optionally, you can mount your local Mac dev directory inside the container by adding `-v /path/to/dir:/root`. Typically, I mount a specific dev directory from my Mac that contains my dot files (including  git, ssh config + keys) to make it easier to use across both Mac and within the dev container. This way I can make sure that the dev container is a throw-away, leaving no keys/secrets exposed or written in it. 
 
+### AI Tools
+
+The container includes two AI tools pre-installed:
+
+- **Claude Code CLI** — Anthropic's official CLI for Claude, available as `claude` inside the container.
+- **Ollama client** — The `ollama` CLI is available for interacting with local LLM models.
+
+#### Ollama Pre-requisite (Mac)
+
+To use Ollama from within the container, you need Ollama running natively on your Mac and configured to listen on all interfaces (not just localhost):
+
+1. Install Ollama on your Mac: https://ollama.com/download
+2. Configure Ollama to listen on `0.0.0.0` by setting the environment variable before starting it:
+   ```bash
+   OLLAMA_HOST=0.0.0.0 ollama serve
+   ```
+   Or set it persistently via `launchctl` if using the macOS app:
+   ```bash
+   launchctl setenv OLLAMA_HOST "0.0.0.0"
+   ```
+   Then restart the Ollama app.
+3. Inside the container, point the Ollama client to your Mac's host:
+   ```bash
+   export OLLAMA_HOST=http://host.docker.internal:11434
+   ollama list
+   ```
+
 Feel free to use and adjust to fit your own dev tooling!
 
 Cheers 🍺
