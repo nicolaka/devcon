@@ -1,28 +1,41 @@
+<p align="center">
+  <img src="logo.png" alt="devcon" width="280">
+</p>
+
 ## DEVCON: a Complete Dev Environment in a Container 📦 
 
 **Development Container Blog Post:** [link](https://medium.com/@nicolakabar/the-ultimate-development-environment-moving-from-vagrant-to-docker-for-mac-532bcf07e186)
 
-As a rule of thumb, I never install any packages directly onto my Mac unless I absolutely have to. So I created this sample development container that I use with Docker for Mac to be my sole dev environment. There is a breakdown in the Dockerfile of which tools are installed. 
+As a rule of thumb, I never install any packages directly onto my Mac unless I absolutely have to. So I created this sample development container that I use with Docker for Mac to be my sole dev environment.
 
+### What's included
 
-### Package Versions
-```
-ENV GOLANG_VERSION 1.20.3
-ENV GOLANG_DOWNLOAD_SHA256 eb186529f13f901e7a2c4438a05c2cd90d74706aaa0a888469b2a4a617b6ee54
-ENV TERRAFORM_VERSION 1.6.6
-ENV VAULT_VERSION 1.15.4
-ENV CONSUL_VERSION 1.16.0
-ENV PACKER_VERSION 1.10.0
-ENV BOUNDARY_VERSION 0.14.3
-ENV WAYPOINT_VERSION 0.11.4
-ENV HCDIAG_VERSION 0.5.1
-ENV HCDIAG_EXT_VERSION 0.5.0
-ENV KUBECTL_VER 1.27.1
-ENV HELM_VERSION 3.12.0
-ENV CALICO_VERSION 3.16.1
-ENV COSIGN_VERSION 1.8.0
-ENV INFRACOST_VERSION 0.10.28
-```
+Pinned versions:
+
+| Tool | Version |
+| --- | --- |
+| Go | 1.23.1 |
+| Terraform | 1.14.6 |
+| Terraform Stacks (`tfstacks`) | 0.6.1 |
+| Packer | 1.14.2 |
+| kubectl | 1.33.0 |
+| Helm | 3.14.4 |
+| aws-iam-authenticator | 0.5.9 |
+| Ollama client | 0.40.14 |
+
+Installed from the current release at build time:
+
+- Docker CLI and the Docker Compose plugin
+- kubectx and kubens
+- Krew
+- eksctl
+- Google Cloud CLI
+- AWS CLI v2 and the Session Manager plugin
+- Claude Code
+
+Shell: zsh, Oh My Zsh, Powerlevel10k, and zsh-autosuggestions.
+
+Base packages: `apt-transport-https`, `bash-completion`, `ca-certificates`, `curl`, `dnsutils`, `file`, `fonts-powerline`, `git`, `gnupg`, `httpie`, `iproute2`, `iputils-ping`, `jq`, `less`, `locate`, `netcat-traditional`, `pipx`, `python3-pip`, `python3-setuptools`, `rsync`, `ssh`, `sudo`, `tree`, `unzip`, `vim`, `wget`, `zip`, and `zstd`.
 ### Usage
 
 ```

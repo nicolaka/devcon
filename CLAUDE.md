@@ -33,29 +33,46 @@ All configuration lives in two files:
 - **`Dockerfile`** — The main artifact. Installs all tools in layered `RUN` steps. Version numbers are defined as `ARG`/`ENV` variables at the top, making updates straightforward.
 - **`zshrc`** — Copied into the image as `/root/.zshrc`. Configures Oh My Zsh with the Powerlevel10k theme and development-oriented plugins.
 
+### Architecture: ARM64 Only
+
+All download URLs and binary paths in the Dockerfile target **linux/arm64** (aarch64). When adding a new tool, always use the `arm64` or `aarch64` binary URL, not `amd64`/`x86_64`.
+
 ### Tool Categories in the Dockerfile
 
 1. **Base:** Ubuntu 24.04 (`ubuntu:noble`), system packages via `apt-get`
 2. **Languages:** Go (compiled from source), Python 3, Node.js, Maven
-3. **HashiCorp stack:** Terraform, Vault, Consul, Packer, Boundary, Waypoint, Vault Radar
+3. **HashiCorp stack:** Terraform, Terraform Stacks, Vault, Consul, Packer, Boundary, Waypoint, Vault Radar
 4. **Cloud CLIs:** AWS CLI v2 + plugins (Session Manager, IAM Authenticator), Azure CLI, Google Cloud SDK
 5. **Kubernetes:** kubectl, kubectx/kubens, Helm, Krew, eksctl
 6. **Container tools:** Docker CLI, Docker Compose
 7. **Security/Supply chain:** Cosign, Snyk, Infracost, CFSSL
-8. **AI tools:** Claude Code CLI, Ollama
+8. **AI tools:** Claude Code CLI, Ollama (configured to connect to host via `OLLAMA_HOST=host.docker.internal:11434`)
 9. **Shell:** Oh My Zsh + Powerlevel10k + plugins
+
+### Adding New Tools
+
+There are two patterns for adding tools:
+
+- **Binary download** (HashiCorp pattern): use separate `RUN` steps for download, extract, and cleanup to keep layers readable. Example:
+  ```dockerfile
+  RUN curl https://releases.hashicorp.com/tool/${VERSION}/tool_${VERSION}_linux_arm64.zip -o tool.zip
+  RUN unzip -o tool.zip -d /usr/local/bin
+  RUN rm tool.zip
+  ```
+- **Go install** (for Go-based tools): `RUN go install github.com/owner/repo@latest` — binary lands in `$GOPATH/bin` which is on `$PATH`.
 
 ## Key Version Variables
 
-Versions are defined as `ARG`/`ENV` at the top of the Dockerfile:
+All versions are defined as `ENV` at the top of the Dockerfile. Update these variables rather than editing install steps:
 
 ```
 GOLANG_VERSION, TERRAFORM_VERSION, TERRAFORM_STACKS_VERSION,
 VAULT_VERSION, CONSUL_VERSION, PACKER_VERSION, BOUNDARY_VERSION,
-WAYPOINT_VERSION, RADAR_VERSION, KUBECTL_VER, HELM_VERSION
+WAYPOINT_VERSION, RADAR_VERSION, KUBECTL_VER, HELM_VERSION,
+CALICO_VERSION, COSIGN_VERSION, INFRACOST_VERSION
 ```
 
-When updating tool versions, change these variables rather than hunting through the install steps.
+Go also requires updating `GOLANG_DOWNLOAD_SHA256` to match the new version's tarball hash.
 
 ## Published Image
 
